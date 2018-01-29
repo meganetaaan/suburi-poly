@@ -5,9 +5,12 @@
         <a-asset-item id="crate-obj" :src="assets.obj"></a-asset-item>
         <a-asset-item id="crate-mtl" :src="assets.mtl"></a-asset-item>
       </a-assets>
-      <a-text color="red" position="0 2 -2" :value="message"></a-text>
-      <a-obj-model v-if="assets.obj" position="0 0.5 -5" src="#crate-obj" mtl="#crate-mtl"></a-obj-model>
       <a-sky color="#ECECEC"></a-sky>
+      <!-- <a-light type="ambient"></a-light>
+      <a-light type="point" position="1 1 5"></a-light>
+      <a-light position="-1 1 0"></a-light> -->
+      <a-text color="red" position="0 2 -2" :value="message"></a-text>
+      <a-obj-model v-if="assets.obj && assets.mtl" position="1 1 -2" src="#crate-obj" mtl="#crate-mtl"></a-obj-model>
     </a-scene>
   </div>
 </template>
@@ -35,7 +38,7 @@ export default {
       const json = await res.json()
       const asset = json.assets[0]
       const objUrl = asset.formats[0].root.url
-      const mtlUrl = asset.formats[0].resources[0].url
+      const mtlUrl = asset.formats[0].resources[1].url
       this.assets.obj = objUrl
       this.assets.mtl = mtlUrl
       console.log(json)
