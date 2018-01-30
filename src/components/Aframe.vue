@@ -1,16 +1,13 @@
 <template>
   <div>
     <a-scene embedded id="scene">
-      <a-assets v-if="assets.obj">
-        <a-asset-item id="crate-obj" :src="assets.obj"></a-asset-item>
-        <a-asset-item id="crate-mtl" :src="assets.mtl"></a-asset-item>
+      <a-assets v-if="assets.gltf">
+        <a-asset-item id="gltf" :src="assets.gltf"></a-asset-item>
       </a-assets>
       <a-sky color="#ECECEC"></a-sky>
-      <!-- <a-light type="ambient"></a-light>
-      <a-light type="point" position="1 1 5"></a-light>
-      <a-light position="-1 1 0"></a-light> -->
+      <a-light type="ambient"></a-light>
       <a-text color="red" position="0 2 -2" :value="message"></a-text>
-      <a-obj-model v-if="assets.obj && assets.mtl" position="1 1 -2" src="#crate-obj" mtl="#crate-mtl"></a-obj-model>
+      <a-gltf-model v-if="assets.gltf" position="1 1 -2" src="#gltf"></a-gltf-model>
     </a-scene>
   </div>
 </template>
@@ -24,8 +21,7 @@ export default {
     return {
       message: 'Welcome to Your Vue.js App',
       assets: {
-        obj: null,
-        mtl: null
+        gltf: null
       }
     }
   },
@@ -37,10 +33,10 @@ export default {
       const res = await this.fetchResources(keyword)
       const json = await res.json()
       const asset = json.assets[0]
-      const objUrl = asset.formats[0].root.url
-      const mtlUrl = asset.formats[0].resources[1].url
-      this.assets.obj = objUrl
-      this.assets.mtl = mtlUrl
+      const gltfModel = asset.formats.find((f) => {
+        return f.formatType === 'GLTF2'
+      })
+      this.assets.gltf = gltfModel.root.url
       console.log(json)
     },
     async fetchResources (keyword) {
@@ -48,7 +44,7 @@ export default {
       params.set('keywords', keyword)
       params.set('curated', true)
       params.set('maxComplexity', 'MEDIUM')
-      params.set('format', 'OBJ')
+      params.set('format', 'GLTF2')
       params.set('orderBy', 'BEST')
       params.set('key', 'AIzaSyD1D4XIpcswKJ5s-XRqsvtS0T9lSA6zUQA')
       return fetch(`https://poly.googleapis.com/v1/assets?${params.toString()}`)
